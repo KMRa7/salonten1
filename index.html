@@ -1,0 +1,861 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>未成年施術 親権者同意書</title>
+
+  <!-- 必要ならLIFF IDを設定 -->
+  <meta name="liff-id" content="YOUR_LIFF_ID" />
+  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+
+  <style>
+    :root{
+      --bg:#f2f2f2;
+      --line:#e6e6e6;
+      --text:#222;
+      --muted:#777;
+      --card:#fff;
+      --input:#fff;
+      --radius:6px;
+      --dark:#222;
+    }
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      background:var(--bg);
+      color:var(--text);
+      font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans JP",sans-serif;
+    }
+    .titlebar{
+      background:#efefef;
+      border-bottom:1px solid var(--line);
+      padding:12px 14px;
+      text-align:center;
+      font-weight:800;
+      letter-spacing:.02em;
+      position:sticky;
+      top:0;
+      z-index:10;
+    }
+    .sheet{
+      max-width:760px;
+      margin:0 auto;
+      background:var(--card);
+      border-top:1px solid var(--line);
+      border-bottom:1px solid var(--line);
+    }
+    .sectionTitle{
+      padding:16px 14px 10px;
+      font-weight:900;
+      font-size:16px;
+      background:#fafafa;
+      border-top:1px solid var(--line);
+      border-bottom:1px solid var(--line);
+    }
+    .sectionLead{
+      padding:14px;
+      line-height:1.8;
+      font-size:14px;
+      background:#fff;
+      border-top:1px solid var(--line);
+    }
+    .row{
+      display:grid;
+      grid-template-columns:160px 1fr;
+      gap:10px;
+      padding:14px;
+      border-top:1px solid var(--line);
+      align-items:start;
+    }
+    .label{
+      font-weight:800;
+      padding-top:10px;
+      line-height:1.3;
+      font-size:15px;
+    }
+    .label .req{ margin-left:4px; font-weight:900; }
+    .control{ flex:1; }
+    .hint{
+      font-size:12px;
+      color:var(--muted);
+      margin:0 0 6px;
+      line-height:1.5;
+    }
+    input, textarea{
+      width:100%;
+      border:1px solid #d6d6d6;
+      border-radius:6px;
+      padding:0 12px;
+      background:#fff;
+      font-size:16px;
+      outline:none;
+    }
+    input{ height:46px; }
+    textarea{
+      padding:10px 12px;
+      min-height:120px;
+      resize:vertical;
+      font-size:16px;
+    }
+    input:focus, textarea:focus{
+      border-color:#9bbcff;
+      box-shadow:0 0 0 3px rgba(11,99,255,.12);
+    }
+    .checkGrid{
+      display:grid;
+      gap:10px;
+      margin-top:4px;
+    }
+    .checkItem{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      font-weight:700;
+    }
+    .checkItem input[type="checkbox"]{
+      width:20px;
+      height:20px;
+      flex:0 0 20px;
+    }
+    .inlineInput{
+      margin-top:8px;
+    }
+    .agreeBlock{
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      padding-top:2px;
+    }
+    .agreeLine{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      font-weight:800;
+      color:#222;
+      user-select:none;
+    }
+    .agreeLine input{
+      width:20px;
+      height:20px;
+      accent-color:#111;
+    }
+    .pillGreen{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      height:44px;
+      padding:0 16px;
+      border-radius:999px;
+      border:2px solid #111;
+      background:#fff;
+      color:#111;
+      font-weight:900;
+      cursor:pointer;
+      width:100%;
+    }
+    .pillGreen:hover{ background:#f4f4f4; }
+
+    .modalOverlay{
+      position:fixed;
+      inset:0;
+      background:rgba(0,0,0,.55);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding:18px;
+      z-index:100;
+    }
+    .modal{
+      width:min(720px,100%);
+      background:#fff;
+      border-radius:14px;
+      overflow:hidden;
+      box-shadow:0 20px 60px rgba(0,0,0,.25);
+      max-height:85vh;
+      display:flex;
+      flex-direction:column;
+    }
+    .modalHeader{
+      padding:14px 16px;
+      font-weight:900;
+      border-bottom:1px solid var(--line);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+    }
+    .modalClose{
+      border:0;
+      background:#f2f2f2;
+      border-radius:10px;
+      padding:8px 10px;
+      cursor:pointer;
+      font-weight:800;
+    }
+    .modalBody{
+      padding:14px 16px;
+      overflow:auto;
+      line-height:1.8;
+      font-size:14px;
+      color:#222;
+      white-space:pre-line;
+    }
+    .modalFooter{
+      padding:12px 16px;
+      border-top:1px solid var(--line);
+      display:flex;
+      gap:10px;
+    }
+    .agreeBtn{
+      flex:1;
+      height:46px;
+      border:0;
+      border-radius:12px;
+      background:#111;
+      color:#fff;
+      font-size:16px;
+      font-weight:900;
+      cursor:pointer;
+    }
+    .agreeBtn:disabled{
+      opacity:.45;
+      cursor:not-allowed;
+    }
+
+    .actionsRow{
+      padding:18px 14px 22px;
+      border-top:1px solid var(--line);
+      background:#fff;
+      position:sticky;
+      bottom:0;
+      z-index:5;
+      padding-bottom:calc(22px + env(safe-area-inset-bottom));
+    }
+    .pillConfirm{
+      width:100%;
+      height:52px;
+      border-radius:999px;
+      font-size:16px;
+      font-weight:900;
+      cursor:pointer;
+      border:2px solid #111;
+      background:#fff;
+      color:#111;
+    }
+    .pillConfirm:disabled{
+      opacity:.45;
+      cursor:not-allowed;
+    }
+
+    .confirm{ display:none; padding:14px; }
+    .confirm h2{ margin:8px 0 12px; font-size:18px; }
+    .summary{
+      border:1px solid var(--line);
+      border-radius:12px;
+      overflow:hidden;
+      background:#fff;
+    }
+    .sumGroupTitle{
+      padding:12px 14px;
+      background:#fafafa;
+      font-weight:900;
+      border-top:1px solid var(--line);
+    }
+    .sumGroupTitle:first-child{
+      border-top:0;
+    }
+    .sumRow{
+      display:flex;
+      gap:12px;
+      padding:12px 14px;
+      border-top:1px solid var(--line);
+    }
+    .sumKey{
+      width:200px;
+      min-width:200px;
+      color:#111;
+      font-weight:900;
+    }
+    .sumVal{
+      flex:1;
+      color:#222;
+      word-break:break-word;
+      white-space:pre-line;
+    }
+    .confirmActions{ display:flex; gap:12px; margin-top:14px; }
+    .ghost, .send{
+      flex:1;
+      height:52px;
+      border-radius:999px;
+      font-size:16px;
+      font-weight:900;
+      cursor:pointer;
+    }
+    .ghost{
+      border:2px solid #666;
+      background:#fff;
+      color:#111;
+    }
+    .send{
+      border:0;
+      background:#222;
+      color:#fff;
+    }
+    .send:disabled{
+      opacity:.45;
+      cursor:not-allowed;
+    }
+
+    @media (max-width:520px){
+      .row{ grid-template-columns:1fr; }
+      .label{ padding-top:0; }
+      .sumRow{ display:block; }
+      .sumKey{
+        width:auto;
+        min-width:0;
+        margin-bottom:6px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="titlebar">未成年施術 親権者同意書</div>
+
+  <main class="sheet" id="inputView">
+    <form id="consentForm" novalidate>
+
+      <div class="sectionTitle">【未成年者情報】</div>
+
+      <div class="row">
+        <div class="label">氏名<span class="req">*</span></div>
+        <div class="control">
+          <input id="minorName" type="text" placeholder="例：山田 花子" required />
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="label">フリガナ<span class="req">*</span></div>
+        <div class="control">
+          <input id="minorKana" type="text" placeholder="例：ヤマダ ハナコ" required />
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="label">生年月日<span class="req">*</span></div>
+        <div class="control">
+          <input id="minorBirthday" type="date" required />
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="label">年齢<span class="req">*</span></div>
+        <div class="control">
+          <input id="minorAge" type="number" min="0" max="19" placeholder="例：17" required />
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="label">住所<span class="req">*</span></div>
+        <div class="control">
+          <input id="minorAddress" type="text" placeholder="住所を入力" required />
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="label">電話番号<span class="req">*</span></div>
+        <div class="control">
+          <input id="minorPhone" type="tel" inputmode="tel" placeholder="例：090-1234-5678" required />
+        </div>
+      </div>
+
+      <div class="sectionTitle">【親権者情報】</div>
+
+      <div class="row">
+        <div class="label">親権者氏名<span class="req">*</span></div>
+        <div class="control">
+          <input id="guardianName" type="text" placeholder="例：山田 太郎" required />
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="label">フリガナ<span class="req">*</span></div>
+        <div class="control">
+          <input id="guardianKana" type="text" placeholder="例：ヤマダ タロウ" required />
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="label">未成年者との続柄<span class="req">*</span></div>
+        <div class="control">
+          <input id="relationship" type="text" placeholder="例：父 / 母" required />
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="label">住所<span class="req">*</span></div>
+        <div class="control">
+          <input id="guardianAddress" type="text" placeholder="住所を入力" required />
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="label">電話番号<span class="req">*</span></div>
+        <div class="control">
+          <input id="guardianPhone" type="tel" inputmode="tel" placeholder="例：090-1234-5678" required />
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="label">緊急連絡先<span class="req">*</span></div>
+        <div class="control">
+          <input id="emergencyPhone" type="tel" inputmode="tel" placeholder="例：080-1234-5678" required />
+        </div>
+      </div>
+
+      <div class="sectionTitle">【同意内容】</div>
+
+      <div class="row">
+        <div class="label">施術内容<span class="req">*</span></div>
+        <div class="control">
+          <div class="checkGrid">
+            <label class="checkItem">
+              <input id="menuHairRemoval" type="checkbox" />
+              <span>脱毛施術</span>
+            </label>
+
+            <label class="checkItem">
+              <input id="menuEyelash" type="checkbox" />
+              <span>まつ毛施術</span>
+            </label>
+          </div>
+
+          <div id="eyelashDetailWrap" style="display:none;">
+            <input id="eyelashDetail" class="inlineInput" type="text" placeholder="まつ毛施術の内容を入力" />
+          </div>
+
+          <p class="hint">※いずれか1つ以上選択してください。</p>
+        </div>
+      </div>
+
+      <div class="sectionTitle">【記入日】</div>
+
+      <div class="row">
+        <div class="label">記入日<span class="req">*</span></div>
+        <div class="control">
+          <input id="fillDate" type="date" required />
+        </div>
+      </div>
+
+      <div class="sectionTitle">【同意確認】</div>
+
+      <div class="row">
+        <div class="label">同意<span class="req">*</span></div>
+        <div class="control">
+          <div class="agreeBlock">
+            <label class="agreeLine">
+              <input id="agreeConsent" type="checkbox" disabled />
+              <span>同意事項に同意する</span>
+            </label>
+            <small class="hint">※ポップアップ内を下までスクロールすると「同意する」が押せます。</small>
+            <button class="pillGreen" type="button" id="openConsent">内容を確認する</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="actionsRow">
+        <button class="pillConfirm" type="button" id="toConfirm" disabled>確認</button>
+      </div>
+    </form>
+  </main>
+
+  <main class="sheet confirm" id="confirmView" aria-live="polite">
+    <div style="padding:14px;">
+      <h2>入力内容の確認</h2>
+      <div class="summary" id="summary"></div>
+
+      <div class="confirmActions">
+        <button class="ghost" type="button" id="backBtn">戻る</button>
+        <button class="send" type="button" id="sendBtn">送信</button>
+      </div>
+
+      <p class="hint" style="margin-top:10px;">
+        ※LINEアプリ内で開いた場合のみ送信できます。
+      </p>
+    </div>
+  </main>
+
+  <div class="modalOverlay" id="consentModal" role="dialog" aria-modal="true" aria-labelledby="consentTitle">
+    <div class="modal">
+      <div class="modalHeader">
+        <div id="consentTitle">未成年施術 親権者同意事項</div>
+        <button class="modalClose" type="button" data-close="consentModal">閉じる</button>
+      </div>
+
+      <div class="modalBody" id="consentBody">
+【同意内容】
+私は、上記未成年者が salon de TEN において脱毛および美容施術（まつ毛施術等）を受けることに同意します。
+また、施術内容・注意事項・リスクについて説明を受け、十分理解したうえで同意いたします。
+
+【注意事項確認】
+・施術には個人差があり、効果・結果を保証するものではないこと
+・肌質や体調により赤み・かゆみ・刺激などが出る可能性があること
+・体調不良・皮膚疾患・服薬中の場合は施術をお断りすることがあること
+・安全を優先し、施術を中止または延期する場合があること
+
+【日焼け・自己処理に関する同意】
+施術前後の日焼け、自己処理、スキンケア等により
+肌トラブルが生じた場合でも、
+サロンは一切の責任を負わないことに同意いたします。
+
+【免責および返金に関する同意】
+私は、本施術が医療行為ではなく美容施術であることを理解し、
+施術に伴う効果や結果には個人差があり、
+必ずしも希望する結果が得られるものではないことを了承いたします。
+
+また、施術後に発生した肌トラブル等については、
+体質・生活習慣・自己処理・日焼け・申告漏れ等の影響による可能性があることを理解し、
+すべて自己責任とし、返金・損害賠償等の請求は行わないことに同意いたします。
+
+なお、安全を最優先とし、施術者の判断により
+施術を中止または延期する場合があることを了承いたします。
+      </div>
+
+      <div class="modalFooter">
+        <button class="agreeBtn" type="button" id="agreeConsentBtn" disabled>同意する</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const el = (id) => document.getElementById(id);
+
+    const LIFF_ID = document.querySelector('meta[name="liff-id"]')?.content || "";
+
+    const inputView = el("inputView");
+    const confirmView = el("confirmView");
+    const summaryEl = el("summary");
+
+    const minorName = el("minorName");
+    const minorKana = el("minorKana");
+    const minorBirthday = el("minorBirthday");
+    const minorAge = el("minorAge");
+    const minorAddress = el("minorAddress");
+    const minorPhone = el("minorPhone");
+
+    const guardianName = el("guardianName");
+    const guardianKana = el("guardianKana");
+    const relationship = el("relationship");
+    const guardianAddress = el("guardianAddress");
+    const guardianPhone = el("guardianPhone");
+    const emergencyPhone = el("emergencyPhone");
+
+    const menuHairRemoval = el("menuHairRemoval");
+    const menuEyelash = el("menuEyelash");
+    const eyelashDetailWrap = el("eyelashDetailWrap");
+    const eyelashDetail = el("eyelashDetail");
+
+    const fillDate = el("fillDate");
+
+    const agreeConsent = el("agreeConsent");
+    const openConsent = el("openConsent");
+    const consentModal = el("consentModal");
+    const consentBody = el("consentBody");
+    const agreeConsentBtn = el("agreeConsentBtn");
+
+    const toConfirm = el("toConfirm");
+    const backBtn = el("backBtn");
+    const sendBtn = el("sendBtn");
+
+    let liffReady = false;
+
+    document.addEventListener("DOMContentLoaded", async () => {
+      syncConditionalUI();
+      refreshConfirmButton();
+      await setupLiff();
+    });
+
+    async function setupLiff(){
+      if(!LIFF_ID || LIFF_ID === "YOUR_LIFF_ID"){
+        updateSendButtonState();
+        return;
+      }
+
+      try{
+        await liff.init({ liffId: LIFF_ID });
+        liffReady = true;
+      }catch(error){
+        console.error("LIFF init error:", error);
+      }
+
+      updateSendButtonState();
+    }
+
+    function syncConditionalUI(){
+      eyelashDetailWrap.style.display = menuEyelash.checked ? "block" : "none";
+      if(!menuEyelash.checked) eyelashDetail.value = "";
+      refreshConfirmButton();
+    }
+
+    function hasSelectedMenu(){
+      return menuHairRemoval.checked || menuEyelash.checked;
+    }
+
+    function getFormData(){
+      return {
+        minorName: minorName.value.trim(),
+        minorKana: minorKana.value.trim(),
+        minorBirthday: minorBirthday.value,
+        minorAge: minorAge.value.trim(),
+        minorAddress: minorAddress.value.trim(),
+        minorPhone: minorPhone.value.trim(),
+        guardianName: guardianName.value.trim(),
+        guardianKana: guardianKana.value.trim(),
+        relationship: relationship.value.trim(),
+        guardianAddress: guardianAddress.value.trim(),
+        guardianPhone: guardianPhone.value.trim(),
+        emergencyPhone: emergencyPhone.value.trim(),
+        menuHairRemoval: menuHairRemoval.checked,
+        menuEyelash: menuEyelash.checked,
+        eyelashDetail: eyelashDetail.value.trim(),
+        fillDate: fillDate.value
+      };
+    }
+
+    function isFormRoughlyFilled(){
+      const d = getFormData();
+
+      if(!d.minorName || !d.minorKana || !d.minorBirthday || !d.minorAge || !d.minorAddress || !d.minorPhone) return false;
+      if(!d.guardianName || !d.guardianKana || !d.relationship || !d.guardianAddress || !d.guardianPhone || !d.emergencyPhone) return false;
+      if(!hasSelectedMenu()) return false;
+      if(d.menuEyelash && !d.eyelashDetail) return false;
+      if(!d.fillDate) return false;
+
+      return true;
+    }
+
+    function refreshConfirmButton(){
+      toConfirm.disabled = !(agreeConsent.checked && isFormRoughlyFilled());
+    }
+
+    function updateSendButtonState(){
+      sendBtn.disabled = !(liffReady && typeof liff !== "undefined" && liff.isInClient());
+    }
+
+    [
+      minorName, minorKana, minorBirthday, minorAge, minorAddress, minorPhone,
+      guardianName, guardianKana, relationship, guardianAddress, guardianPhone,
+      emergencyPhone, eyelashDetail, fillDate
+    ].forEach(node => {
+      node.addEventListener("input", refreshConfirmButton);
+      node.addEventListener("change", refreshConfirmButton);
+    });
+
+    [menuHairRemoval, menuEyelash].forEach(node => {
+      node.addEventListener("change", syncConditionalUI);
+    });
+
+    function openModalWithScrollGate(modalEl, bodyEl, agreeBtnEl){
+      modalEl.style.display = "flex";
+      agreeBtnEl.disabled = true;
+      bodyEl.scrollTop = 0;
+
+      const check = () => {
+        const nearBottom = bodyEl.scrollTop + bodyEl.clientHeight >= bodyEl.scrollHeight - 4;
+        if(nearBottom) agreeBtnEl.disabled = false;
+      };
+
+      check();
+      bodyEl._scrollGateHandler && bodyEl.removeEventListener("scroll", bodyEl._scrollGateHandler);
+      bodyEl._scrollGateHandler = check;
+      bodyEl.addEventListener("scroll", check, { passive:true });
+    }
+
+    openConsent.addEventListener("click", () => {
+      openModalWithScrollGate(consentModal, consentBody, agreeConsentBtn);
+    });
+
+    document.querySelectorAll("[data-close]").forEach(btn => {
+      btn.addEventListener("click", () => el(btn.dataset.close).style.display = "none");
+    });
+
+    consentModal.addEventListener("click", (e) => {
+      if(e.target === consentModal) consentModal.style.display = "none";
+    });
+
+    agreeConsentBtn.addEventListener("click", () => {
+      agreeConsent.checked = true;
+      consentModal.style.display = "none";
+      refreshConfirmButton();
+    });
+
+    function buildMenuText(d){
+      const menus = [];
+      if(d.menuHairRemoval) menus.push("脱毛施術");
+      if(d.menuEyelash) menus.push(`まつ毛施術（${d.eyelashDetail}）`);
+      return menus.join(" / ");
+    }
+
+    function validate(){
+      const d = getFormData();
+
+      if(!d.minorName){ alert("氏名を入力してください。"); minorName.focus(); return null; }
+      if(!d.minorKana){ alert("フリガナを入力してください。"); minorKana.focus(); return null; }
+      if(!d.minorBirthday){ alert("生年月日を入力してください。"); minorBirthday.focus(); return null; }
+      if(!d.minorAge){ alert("年齢を入力してください。"); minorAge.focus(); return null; }
+      if(!d.minorAddress){ alert("住所を入力してください。"); minorAddress.focus(); return null; }
+      if(!d.minorPhone){ alert("電話番号を入力してください。"); minorPhone.focus(); return null; }
+
+      if(!d.guardianName){ alert("親権者氏名を入力してください。"); guardianName.focus(); return null; }
+      if(!d.guardianKana){ alert("親権者フリガナを入力してください。"); guardianKana.focus(); return null; }
+      if(!d.relationship){ alert("未成年者との続柄を入力してください。"); relationship.focus(); return null; }
+      if(!d.guardianAddress){ alert("住所を入力してください。"); guardianAddress.focus(); return null; }
+      if(!d.guardianPhone){ alert("電話番号を入力してください。"); guardianPhone.focus(); return null; }
+      if(!d.emergencyPhone){ alert("緊急連絡先を入力してください。"); emergencyPhone.focus(); return null; }
+
+      if(!hasSelectedMenu()){
+        alert("施術内容を1つ以上選択してください。");
+        return null;
+      }
+
+      if(d.menuEyelash && !d.eyelashDetail){
+        alert("まつ毛施術の内容を入力してください。");
+        eyelashDetail.focus();
+        return null;
+      }
+
+      if(!d.fillDate){
+        alert("記入日を入力してください。");
+        fillDate.focus();
+        return null;
+      }
+
+      if(!agreeConsent.checked){
+        alert("同意事項を確認し、同意してください。");
+        return null;
+      }
+
+      return d;
+    }
+
+    function buildMessageText(d){
+      return [
+        "≪未成年施術 親権者同意書≫",
+        "【未成年者情報】",
+        `氏名：${d.minorName}`,
+        `フリガナ：${d.minorKana}`,
+        `生年月日：${d.minorBirthday}`,
+        `年齢：${d.minorAge}歳`,
+        `住所：${d.minorAddress}`,
+        `電話番号：${d.minorPhone}`,
+        "",
+        "【親権者情報】",
+        `親権者氏名：${d.guardianName}`,
+        `フリガナ：${d.guardianKana}`,
+        `未成年者との続柄：${d.relationship}`,
+        `住所：${d.guardianAddress}`,
+        `電話番号：${d.guardianPhone}`,
+        `緊急連絡先：${d.emergencyPhone}`,
+        "",
+        "【同意内容】",
+        buildMenuText(d),
+        "",
+        "【同意確認】",
+        "注意事項確認：同意済み",
+        "日焼け・自己処理に関する同意：同意済み",
+        "免責および返金に関する同意：同意済み",
+        "",
+        `【記入日】${d.fillDate}`
+      ].join("\n");
+    }
+
+    toConfirm.addEventListener("click", () => {
+      const d = validate();
+      if(!d) return;
+
+      summaryEl.innerHTML = `
+        <div class="sumGroupTitle">【未成年者情報】</div>
+        ${sumRow("氏名", d.minorName)}
+        ${sumRow("フリガナ", d.minorKana)}
+        ${sumRow("生年月日", d.minorBirthday)}
+        ${sumRow("年齢", `${d.minorAge}歳`)}
+        ${sumRow("住所", d.minorAddress)}
+        ${sumRow("電話番号", d.minorPhone)}
+
+        <div class="sumGroupTitle">【親権者情報】</div>
+        ${sumRow("親権者氏名", d.guardianName)}
+        ${sumRow("フリガナ", d.guardianKana)}
+        ${sumRow("未成年者との続柄", d.relationship)}
+        ${sumRow("住所", d.guardianAddress)}
+        ${sumRow("電話番号", d.guardianPhone)}
+        ${sumRow("緊急連絡先", d.emergencyPhone)}
+
+        <div class="sumGroupTitle">【同意内容】</div>
+        ${sumRow("施術内容", buildMenuText(d))}
+
+        <div class="sumGroupTitle">【同意確認】</div>
+        ${sumRow("注意事項確認", "同意済み")}
+        ${sumRow("日焼け・自己処理に関する同意", "同意済み")}
+        ${sumRow("免責および返金に関する同意", "同意済み")}
+
+        <div class="sumGroupTitle">【記入日】</div>
+        ${sumRow("記入日", d.fillDate)}
+      `;
+
+      inputView.style.display = "none";
+      confirmView.style.display = "block";
+      updateSendButtonState();
+      window.scrollTo({ top:0, behavior:"smooth" });
+    });
+
+    backBtn.addEventListener("click", () => {
+      confirmView.style.display = "none";
+      inputView.style.display = "block";
+      window.scrollTo({ top:0, behavior:"smooth" });
+    });
+
+    sendBtn.addEventListener("click", async () => {
+      const d = validate();
+      if(!d) return;
+
+      if(!liffReady){
+        alert("LIFFの初期化がまだ完了していません。");
+        return;
+      }
+      if(!liff.isInClient()){
+        alert("LINEアプリ内で開いたときだけ送信できます。");
+        return;
+      }
+
+      const text = buildMessageText(d);
+
+      try{
+        await liff.sendMessages([{ type:"text", text }]);
+        alert("LINEに送信しました。");
+        if(liff.isInClient()) liff.closeWindow();
+      }catch(error){
+        console.error("liff.sendMessages error:", error);
+        alert(`送信に失敗しました: ${error.message || error}`);
+      }
+    });
+
+    function sumRow(key, value){
+      return `
+        <div class="sumRow">
+          <div class="sumKey">${escapeHtml(key)}</div>
+          <div class="sumVal">${escapeHtml(value)}</div>
+        </div>
+      `;
+    }
+
+    function escapeHtml(s){
+      return String(s)
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+    }
+  </script>
+</body>
+</html>
